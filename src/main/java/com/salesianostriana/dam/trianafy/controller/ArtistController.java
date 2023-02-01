@@ -50,13 +50,9 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artistas no encontrados",
                     content = @Content) })
    @GetMapping("/artist/{id}")
-    public ResponseEntity<?> obtenerUno (@PathVariable Long id){
-       Artist result = artistService.findById(id).orElse(null);
-       if (result == null){
-           return ResponseEntity.notFound().build();
-       }else
-           return ResponseEntity.ok(result);
-   }
+    public Artist obtenerUno (@PathVariable Long id){
+       return artistService.findById(id);
+    }
 
     @Operation(summary = "Crea un artista en la lista de artistas")
     @ApiResponses(value = {
@@ -85,7 +81,7 @@ public class ArtistController {
                     content = @Content) })
    @PutMapping("/artist/{id}")
     public ResponseEntity<?> editarArtista (@RequestBody Artist editar, @PathVariable Long id){
-        return artistService.findById(id).map(a -> {
+        return artistService.findById2(id).map(a -> {
             a.setName((editar.getName()));
             return ResponseEntity.ok(artistService.add(a));
         }).orElseGet(() -> {

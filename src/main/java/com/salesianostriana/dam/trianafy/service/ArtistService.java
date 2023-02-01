@@ -1,6 +1,8 @@
 package com.salesianostriana.dam.trianafy.service;
 
 
+import com.salesianostriana.dam.trianafy.exception.ArtistNotFoundException;
+import com.salesianostriana.dam.trianafy.exception.EmptyArtistListException;
 import com.salesianostriana.dam.trianafy.model.Artist;
 import com.salesianostriana.dam.trianafy.repos.ArtistRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +22,8 @@ public class ArtistService {
         return repository.save(artist);
     }
 
-    public Optional<Artist> findById(Long id) {
-        return repository.findById(id);
-    }
 
-    public List<Artist> findAll() {
-        return repository.findAll();
-    }
+
 
     public Artist edit(Artist artist) {
         return repository.save(artist);
@@ -38,6 +35,27 @@ public class ArtistService {
 
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+//NUEVOS
+    public List<Artist> findAll() {
+        List<Artist> result = repository.findAll();
+
+        if (result.isEmpty()) {
+            throw new EmptyArtistListException();
+        }
+
+        return result;
+
+    }
+
+    public Artist findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ArtistNotFoundException(id));
+    }
+
+    public Optional<Artist> findById2(Long id) {
+        return repository.findById(id);
     }
 
 }

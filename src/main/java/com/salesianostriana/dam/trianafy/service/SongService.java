@@ -50,7 +50,7 @@ public class SongService {
     public Song toSong(OneSongRequestDTO oneSongRequestDTO){
         return Song.builder()
                 .title(oneSongRequestDTO.getTitle())
-                .artist(artistService.findById(oneSongRequestDTO.getArtistId()).get())      //OJO
+                .artist(artistService.findById(oneSongRequestDTO.getArtistId()))      //OJO
                 .album(oneSongRequestDTO.getAlbum())
                 .year(oneSongRequestDTO.getYear())
                 .build();

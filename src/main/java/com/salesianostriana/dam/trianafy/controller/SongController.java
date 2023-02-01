@@ -73,7 +73,7 @@ public class SongController {
                     content = @Content) })
     @PostMapping("/song/")
     public ResponseEntity<OneSongResponseDTO> nuevaCancion (@RequestBody OneSongRequestDTO nuevo){
-        if(nuevo.getTitle() != "" && artistService.findById(nuevo.getArtistId()).isPresent()){
+        if(nuevo.getTitle() != "" && artistService.findById2(nuevo.getArtistId()).isPresent()){
             Song saved = songService.add(songService.toSong(nuevo));
             return ResponseEntity.status(HttpStatus.CREATED).body(OneSongResponseDTO.of(saved));
         }
