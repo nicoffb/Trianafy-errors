@@ -12,7 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 
@@ -32,14 +35,12 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artistas no encontrados",
                     content = @Content) })
    @GetMapping("/artist")
-   public ResponseEntity<?> obtenerTodos(){
-       List<Artist> result = artistService.findAll();
-       if (result.isEmpty()){
-           return ResponseEntity.notFound().build();
-       }else{
-           return ResponseEntity.ok(result);
-       }
+   public List<Artist> obtenerTodos(){
+       return artistService.findAll();
    }
+
+
+
 
     @Operation(summary = "Obtiene un artista a partir de un id dado")
     @ApiResponses(value = {
@@ -54,6 +55,14 @@ public class ArtistController {
        return artistService.findById(id);
     }
 
+
+
+
+
+
+
+
+    //POST
     @Operation(summary = "Crea un artista en la lista de artistas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Se ha creado el artista",
@@ -63,14 +72,26 @@ public class ArtistController {
             @ApiResponse(responseCode = "400", description = "Los datos introducidos son erróneos",
                     content = @Content) })
    @PostMapping("/artist")
-    public ResponseEntity<Artist> nuevoArtista (@RequestBody Artist nuevo){
+    public ResponseEntity<Artist> nuevoArtista (@Valid @RequestBody Artist nuevo){
+        //falta quitar esta comprobación mediante el valid
        if(nuevo.getName() == ""){
            return ResponseEntity.badRequest().build();
        }
        Artist saved = artistService.add(nuevo);
-       return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+        URI createdURI = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId()).toUri();
+
+       return ResponseEntity.created(createdURI).body(saved); //la uri se verá en HEADERS, location
    }
 
+
+
+
+
+   //PUT
     @Operation(summary = "Edita un artista a partir de un id dado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Se ha realizado la modificación",
@@ -80,15 +101,15 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artista no encontrado",
                     content = @Content) })
    @PutMapping("/artist/{id}")
-    public ResponseEntity<?> editarArtista (@RequestBody Artist editar, @PathVariable Long id){
-        return artistService.findById2(id).map(a -> {
-            a.setName((editar.getName()));
-            return ResponseEntity.ok(artistService.add(a));
-        }).orElseGet(() -> {
-            return ResponseEntity.notFound().build();
-        });
+    public Artist editarArtista (@PathVariable Long id,@RequestBody Artist editar){
+        return artistService.edit(id,editar);
    }
 
+
+
+
+
+   //DELETE
     @Operation(summary = "Elimina a un artista a partir de un id dado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Artista eliminado",

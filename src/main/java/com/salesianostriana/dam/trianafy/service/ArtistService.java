@@ -23,12 +23,6 @@ public class ArtistService {
     }
 
 
-
-
-    public Artist edit(Artist artist) {
-        return repository.save(artist);
-    }
-
     public void delete(Artist artist) {
         repository.delete(artist);
     }
@@ -57,5 +51,19 @@ public class ArtistService {
     public Optional<Artist> findById2(Long id) {
         return repository.findById(id);
     }
+    //este se usa en songcontroller
+
+
+    public Artist edit(Long id,Artist edited){
+        return repository.findById(id)
+                .map(artist -> {
+                    artist.setName(edited.getName());
+                    return repository.save(artist);
+                })
+                .orElseThrow(()->new ArtistNotFoundException());
+    }
+
+
+
 
 }
